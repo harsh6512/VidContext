@@ -1,4 +1,8 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify;
+
+load_dotenv()
 from getVideoDetails import getVideoDetails;
 from sumTranscript import sumTranscript;
 from chat import update_vector_store, ask_question
@@ -68,4 +72,5 @@ def chat_with_video():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(debug=True, port=port)

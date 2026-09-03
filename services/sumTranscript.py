@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema import StrOutputParser 
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser 
 
 
 load_dotenv()
