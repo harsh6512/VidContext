@@ -34,7 +34,7 @@ prompt = [
 ]
 
 prompt_template = ChatPromptTemplate.from_messages(prompt)
-model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+model = ChatGoogleGenerativeAI(model="gemini-3.6-flash")
 chain = prompt_template | model | StrOutputParser()
 
 

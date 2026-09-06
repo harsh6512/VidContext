@@ -22,25 +22,27 @@ def videoData():
     if not video_url:
         return jsonify({"error": "Missing video_url"}), 400;
 
-    result  = getVideoDetails(video_url);
+    try:
+        result  = getVideoDetails(video_url);
 
-    if "error" in result:
-        return jsonify({"error": result["error"]}), 500;
+        if "error" in result:
+            return jsonify({"error": result["error"]}), 500;
 
-    title = result["title"];
-    transcript_text = result["transcript_text"];
-    formatted_transcript = result["formatted_transcript"];
+        title = result["title"];
+        transcript_text = result["transcript_text"];
+        formatted_transcript = result["formatted_transcript"];
 
-    summary = sumTranscript(transcript_text);
-    chapters = generate_chapters(formatted_transcript);
+        summary = sumTranscript(transcript_text);
+        chapters = generate_chapters(formatted_transcript);
 
-
-    return jsonify({
-            "title":title,
-            "transcript":formatted_transcript,
-            "chapter":chapters,
-            "summary": summary
-        });
+        return jsonify({
+                "title":title,
+                "transcript":formatted_transcript,
+                "chapter":chapters,
+                "summary": summary
+            });
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 @app.route('/api/update-vector-store', methods=['POST'])
 def update_vector():

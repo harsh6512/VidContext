@@ -20,7 +20,7 @@ def generate_chapters(transcript_array):
     splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     docs = splitter.split_documents(docs)
 
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")  
+    llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash")  
     parser = StrOutputParser()
 
     prompt = PromptTemplate.from_template("""
@@ -40,7 +40,7 @@ def generate_chapters(transcript_array):
 
     Example:
     [
-        { "startTime": "00:10:00", "title": "AI in Healthcare", "description": "We explore how artificial intelligence is transforming healthcare." }
+        {{ "startTime": "00:10:00", "title": "AI in Healthcare", "description": "We explore how artificial intelligence is transforming healthcare." }}
     ]
 
     Transcript chunk:
