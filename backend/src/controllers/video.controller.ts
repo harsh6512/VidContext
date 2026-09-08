@@ -50,7 +50,7 @@ export const getVideo = async (req: Request, res: Response, next: NextFunction):
     const videoData: VideoDocument | null = await Video.findOne({ video_url });
 
     if (videoData) {
-      updateVecStore(videoData.transcript);
+      await updateVecStore(videoData.transcript);
       const userVideoRecord = await UserVideoData.findOne({ user: userId, video: videoData._id }).select("video notes chatHistory").populate<{ video: VideoDocument }>("video");
 
       if (userVideoRecord) {
@@ -108,7 +108,7 @@ export const getVideo = async (req: Request, res: Response, next: NextFunction):
       video: newVideo._id,
     });
 
-    updateVecStore(newVideo.transcript);
+    await updateVecStore(newVideo.transcript);
 
     res.status(200).json({
       _id: newVideo._id,
@@ -127,16 +127,16 @@ export const getVideo = async (req: Request, res: Response, next: NextFunction):
   }
 }
 
-export const getAns = async (req: Request, res: Response, next: NextFunction): Promise<void> => { 
+export const getAns = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const user = req.user as UserDocument;
     const userId = user?._id;
-    
+
     if (!userId) {
       throw new AppError("User does not have a _id", 500);
-    }  
+    }
     const { question } = req.body;
-    if(!question) {
+    if (!question) {
       throw new AppError("question is required!", 400);
     }
 
@@ -153,7 +153,7 @@ export const getAns = async (req: Request, res: Response, next: NextFunction): P
     }
 
     res.status(200).json(data);
-  } catch(error) {
+  } catch (error) {
     console.log("Error in getAns controller");
     next(error);
   }
@@ -190,4 +190,3 @@ export const saveNotes = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
-
