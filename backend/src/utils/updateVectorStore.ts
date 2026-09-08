@@ -25,6 +25,7 @@ export const updateVecStore = async (transcript: transcript_segments[]) => {
     }
 
   } catch (error) {
-    console.error("Error in updateVecStore",error);
+    console.error("Error in updateVecStore", error);
+    throw error;
   }
 };
