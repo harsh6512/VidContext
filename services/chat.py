@@ -25,26 +25,26 @@ def update_vector_store(transcript):
     splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     chunks = splitter.split_documents(docs)
 
-    embedding = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+    embedding = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
     vector_store = FAISS.from_documents(chunks, embedding)
     retriever = vector_store.as_retriever()
 
     llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash")
     prompt = PromptTemplate.from_template("""
-    You are a helpful AI assistant. Answer the question strictly based ONLY on the transcript context provided below.
+    You are a knowledgeable, helpful, and conversational AI assistant answering questions about a video.
+    Answer the user's question accurately and directly based ONLY on the provided video context below.
 
-    CONTEXT:
+    CONTEXT FROM VIDEO:
     -----------------
     {context}
     -----------------
 
     INSTRUCTIONS:
-    - Use ONLY the information in the CONTEXT above to answer.
-    - Synthesize and paraphrase the information from the transcript in your own words whenever possible.
-    - Use a short, direct quote ONLY if a precise phrase from the transcript is essential for clarity or evidence.
-    - DO NOT copy large sections of the transcript or rely solely on similar-sounding text.
-    - If the answer is missing, unclear, or cannot be determined from the context, respond ONLY with: "I could not find the answer in the transcript."
-    - DO NOT use any prior knowledge or add information not explicitly stated or clearly implied in the context.
+    - Answer directly and naturally in a helpful, conversational tone.
+    - NEVER mention phrases like "Based on the transcript", "According to the transcript", "The transcript states", or "In the provided context". Speak naturally as if discussing the video itself (e.g., refer to "the video" or provide direct answers).
+    - Synthesize and paraphrase key points clearly and structure the response nicely (e.g., using bullet points or bold text where appropriate).
+    - If the answer is not mentioned or cannot be determined from the video content, respond with: "This video does not cover that topic."
+    - Do not make up information or use external knowledge outside what is covered in the video.
 
     QUESTION: {question}
 
