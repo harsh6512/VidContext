@@ -4,10 +4,13 @@ import { useGSAP } from "@gsap/react";
 import { AvatarGroup, CardGroup } from "@/components/LandingPage";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
+import { useGlobalContext } from "@/context/GlobalContext";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 function LandingPage() {
+  const { authUser } = useGlobalContext();
+
   useGSAP(() => {
     gsap.from(".Landing-heading div", {
       y: -60,
@@ -41,13 +44,13 @@ function LandingPage() {
           recorded lectures
         </div>
         <div className="mt-3 flex gap-4">
-          <Link to="/login">
+          <Link to={authUser ? "/learn" : "/login"}>
             <button className="bg-white text-black py-3 px-8 rounded-full border text-lg cursor-pointer">
               See features
             </button>
           </Link>
 
-          <Link to="/signup">
+          <Link to={authUser ? "/learn" : "/signup"}>
             <button className="bg-black text-white py-3 px-8 rounded-full text-lg cursor-pointer">
               Get Started
             </button>
@@ -85,7 +88,7 @@ function LandingPage() {
           <p className="text-gray-500">
             Upload your content and start your learning journey.
           </p>
-          <Link to="/signup">
+          <Link to={authUser ? "/learn" : "/signup"}>
             <Button className="rounded-3xl w-36 h-12 text-md cursor-pointer">
               Get Started
             </Button>

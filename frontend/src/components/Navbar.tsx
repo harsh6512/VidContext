@@ -37,7 +37,7 @@ function Navbar() {
 
   return (
     <nav className="flex backdrop-blur-lg bg-white/50 pb-4 pt-4 border-b border-[#F6F6F6] fixed top-0 w-full z-10 font-roboto">
-      <Link to={"/"}>
+      <Link to={authUser ? "/learn" : "/"}>
         <div className="ml-28 flex gap-2 cursor-pointer items-center" ref={logoref}>
           <img src={logo} alt="logo" className="w-8 h-8 mix-blend-multiply" />
           <div className="font-bold tracking-wide">{!selectedVideo && "YouSummarizer"}</div>

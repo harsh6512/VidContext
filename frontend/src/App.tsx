@@ -13,7 +13,16 @@ const authCheck = () => {
   const userData = localStorage.getItem("you-user");
   const user = userData ? JSON.parse(userData) : null;
 
-  if(!user) return redirect("/login");
+  if (!user) return redirect("/login");
+  return null;
+}
+
+const guestOnlyCheck = () => {
+  const userData = localStorage.getItem("you-user");
+  const user = userData ? JSON.parse(userData) : null;
+
+  if (user) return redirect("/learn");
+  return null;
 }
 
 const router = createBrowserRouter([
@@ -21,9 +30,9 @@ const router = createBrowserRouter([
     path: "/",
     Component: HomeLayout,
     children: [
-      { index: true, Component: LandingPage },
-      { path: "signup", Component: Signup },
-      { path: "login", Component: LoginPage },
+      { index: true, Component: LandingPage, loader: guestOnlyCheck },
+      { path: "signup", Component: Signup, loader: guestOnlyCheck },
+      { path: "login", Component: LoginPage, loader: guestOnlyCheck },
     ],
   },
   {
