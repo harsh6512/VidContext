@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 import { AppError } from "../utils/AppError.util";
 import config from "../config/config";
 import Video from "../models/video.model";
@@ -190,3 +191,40 @@ export const saveNotes = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
+
+export const deleteVideo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const user = req.user as UserDocument;
+    const userId = user?._id;
+
+    if (!userId) {
+      throw new AppError("User does not have a _id", 500);
+    }
+
+    const { videoId } = req.params;
+    const targetVideoId = videoId || req.body?.videoId || req.body?.videoID;
+
+    if (!targetVideoId) {
+      throw new AppError("videoId is required", 400);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(targetVideoId)) {
+      throw new AppError("Invalid video ID format", 400);
+    }
+
+    const deletedRecord = await UserVideoData.findOneAndDelete({
+      user: userId,
+      $or: [{ video: targetVideoId }, { _id: targetVideoId }]
+    });
+
+    if (!deletedRecord) {
+      throw new AppError("Video not found in your recents", 404);
+    }
+
+    res.status(200).json({ message: "Video removed from recents successfully", videoId: targetVideoId });
+  } catch (error) {
+    console.log("Error in deleteVideo controller");
+    next(error);
+  }
+};
+
