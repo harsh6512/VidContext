@@ -27,7 +27,8 @@ function Navbar() {
   };
 
   useGSAP(() => {
-    gsap.from([logoref.current, navtagsref.current, navbuttonref.current], {
+    const elements = [logoref.current, navtagsref.current, navbuttonref.current].filter(Boolean);
+    gsap.from(elements, {
       y: -50,
       duration: 0.6,
       opacity: 0,
@@ -40,31 +41,16 @@ function Navbar() {
       <Link to={authUser ? "/learn" : "/"}>
         <div className="ml-28 flex gap-2 cursor-pointer items-center" ref={logoref}>
           <img src={logo} alt="logo" className="w-8 h-8 mix-blend-multiply" />
-          <div className="font-bold tracking-wide">{!selectedVideo && "YouSummarizer"}</div>
+          <div className="font-bold tracking-wide">{!selectedVideo && "VidContext"}</div>
         </div>
       </Link>
 
-      {selectedVideo ? (
+      {selectedVideo && (
         <div
           className="flex text-gray-900 ml-4 items-center font-roboto"
           ref={navtagsref}
         >
           {selectedVideo.title}
-        </div>
-      ) : (
-        <div
-          className="flex list-none gap-16 font-medium text-gray-500 ml-12 items-center"
-          ref={navtagsref}
-        >
-          <Link to={"/learn"}>
-            <li className="cursor-pointer">Features</li>
-          </Link>
-          <Link to={"/learn"}>
-            <li className="cursor-pointer">Learn</li>
-          </Link>
-          <Link to={"/learn"}>
-            <li className="cursor-pointer">Careers</li>
-          </Link>
         </div>
       )}
 

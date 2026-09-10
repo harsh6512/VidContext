@@ -9,10 +9,11 @@ import YouTube, {
   type YouTubePlayer,
 } from "react-youtube";
 import TranscriptsChapters from "./TranscriptsChapters";
+import { extractYoutubeVideoId } from "@/lib/utils";
 
 function LeftPanel() {
   const { selectedVideo } = useGlobalContext();
-  const videoId = selectedVideo?.video_url.split("v=")[1];
+  const videoId = selectedVideo ? extractYoutubeVideoId(selectedVideo.video_url) || undefined : undefined;
   const [activePanel, setActivePanel] = useState<string>("Chapters");
   const [fullScreen, setFullScreen] = useState<boolean>(false);
   const [autoScroll, setAutoScroll] = useState<boolean>(false);
