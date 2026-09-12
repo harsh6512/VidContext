@@ -30,6 +30,7 @@ export interface chapter_segments {
 }
 
 export interface VideoDocument extends Document {
+  _id: mongoose.Types.ObjectId;
   video_url: string;
   title: string;
   summary: string;

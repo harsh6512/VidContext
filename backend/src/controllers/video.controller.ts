@@ -51,7 +51,7 @@ export const getVideo = async (req: Request, res: Response, next: NextFunction):
     const videoData: VideoDocument | null = await Video.findOne({ video_url });
 
     if (videoData) {
-      await updateVecStore(videoData.transcript);
+      await updateVecStore(videoData.transcript, String(videoData._id));
       const userVideoRecord = await UserVideoData.findOne({ user: userId, video: videoData._id }).select("video notes chatHistory").populate<{ video: VideoDocument }>("video");
 
       if (userVideoRecord) {
@@ -109,7 +109,7 @@ export const getVideo = async (req: Request, res: Response, next: NextFunction):
       video: newVideo._id,
     });
 
-    await updateVecStore(newVideo.transcript);
+    await updateVecStore(newVideo.transcript, String(newVideo._id));
 
     res.status(200).json({
       _id: newVideo._id,
@@ -136,21 +136,38 @@ export const getAns = async (req: Request, res: Response, next: NextFunction): P
     if (!userId) {
       throw new AppError("User does not have a _id", 500);
     }
-    const { question } = req.body;
+    const { question, videoId } = req.body;
     if (!question) {
       throw new AppError("question is required!", 400);
     }
+    if (!videoId) {
+      throw new AppError("videoId is required!", 400);
+    }
 
-    const flask_res = await fetch(`${config.FLASK_URI}/api/chat`, {
+    let flask_res = await fetch(`${config.FLASK_URI}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question })
-    })
+      body: JSON.stringify({ question, video_id: videoId })
+    });
 
-    const data = await flask_res.json();
+    let data = await flask_res.json();
+
+    // Auto-heal if vector store was not found in Flask (e.g. cold restart / ephemeral storage)
+    if (flask_res.status === 404 || (data.error && data.error.includes("Vector store not found"))) {
+      const video = await Video.findById(videoId);
+      if (video && video.transcript?.length) {
+        await updateVecStore(video.transcript, String(video._id));
+        flask_res = await fetch(`${config.FLASK_URI}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, video_id: videoId })
+        });
+        data = await flask_res.json();
+      }
+    }
 
     if (data.error) {
-      throw new AppError(data.error, 500);
+      throw new AppError(data.error, flask_res.status || 500);
     }
 
     res.status(200).json(data);

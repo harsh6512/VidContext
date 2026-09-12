@@ -3,7 +3,7 @@ import { transcript_segments } from "../types/custom";
 import { AppError } from "./AppError.util";
 
 
-export const updateVecStore = async (transcript: transcript_segments[]) => {
+export const updateVecStore = async (transcript: transcript_segments[], videoId: string) => {
 
   const transcriptText = transcript.map(segment => segment.text).join(" ");
 
@@ -14,6 +14,7 @@ export const updateVecStore = async (transcript: transcript_segments[]) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        video_id: videoId,
         transcript_text: transcriptText
       })
     });

@@ -4,3 +4,5 @@
 **/venv
 misc
 **/__pycache__
+**/vector_stores
+services/vector_stores/

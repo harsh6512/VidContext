@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify;
 load_dotenv()
 from getVideoDetails import getVideoDetails;
 from sumTranscript import sumTranscript;
-from chat import update_vector_store, ask_question
+from chat import update_vector_store, ask_question, VectorStoreNotFoundError
 from getChapters import generate_chapters
 
 app = Flask(__name__);
@@ -46,30 +46,38 @@ def videoData():
     
 @app.route('/api/update-vector-store', methods=['POST'])
 def update_vector():
-    data = request.get_json()
+    data = request.get_json() or {}
+    video_id = data.get("video_id")
     transcript_text = data.get("transcript_text")
 
+    if not video_id:
+        return jsonify({"error": "Missing video_id"}), 400
     if not transcript_text:
         return jsonify({"error": "Missing transcript_text"}), 400
 
     try:
-        update_vector_store(transcript_text)
-        return jsonify({"message": "Vector store updated successfully"})
+        update_vector_store(str(video_id), transcript_text)
+        return jsonify({"message": "Vector store updated successfully", "video_id": str(video_id)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
 
 @app.route('/api/chat', methods=['POST'])
 def chat_with_video():
-    data = request.get_json()
+    data = request.get_json() or {}
+    video_id = data.get("video_id")
     question = data.get("question")
 
+    if not video_id:
+        return jsonify({"error": "Missing video_id"}), 400
     if not question:
         return jsonify({"error": "Missing question"}), 400
 
     try:
-        answer = ask_question(question)
+        answer = ask_question(str(video_id), question)
         return jsonify({"answer": answer})
+    except VectorStoreNotFoundError as e:
+        return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

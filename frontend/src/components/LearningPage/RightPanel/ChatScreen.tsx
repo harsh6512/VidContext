@@ -5,13 +5,17 @@ import toast from "react-hot-toast";
 import { useGlobalContext } from "@/context/GlobalContext";
 
 function ChatScreen() {
-  const { authUser, chatMessages, setChatMessages } = useGlobalContext();
+  const { authUser, chatMessages, setChatMessages, selectedVideo } = useGlobalContext();
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+    if (!selectedVideo?._id) {
+      toast.error("Please select a video before asking questions.");
+      return;
+    }
     const userQuestion = input.trim();
     setChatMessages((prev) => [...prev, { from: "user", text: userQuestion }]);
     setInput("");
@@ -26,7 +30,10 @@ function ChatScreen() {
             "Content-Type": "application/json",
             Authorization: "Bearer " + authUser?.token,
           },
-          body: JSON.stringify({ question: userQuestion }),
+          body: JSON.stringify({
+            question: userQuestion,
+            videoId: selectedVideo._id,
+          }),
         }
       );
       const data = await res.json();
